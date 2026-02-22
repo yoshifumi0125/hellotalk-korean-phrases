@@ -1,9 +1,12 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import CategorySection from './components/CategorySection';
+import QuizComponent from './components/QuizComponent';
 import phrasesData from './data/phrases.json';
 import './index.css';
 
 function App() {
+  const [mode, setMode] = useState('list'); // 'list' | 'quiz'
+
   const categories = useMemo(() => {
     const cats = {};
     phrasesData.phrases.forEach(p => {
@@ -12,6 +15,8 @@ function App() {
     });
     return cats;
   }, []);
+
+  const categoryNames = Object.keys(categories);
 
   useEffect(() => {
     // 初回ロード時に音声を読み込んでおく（Safari/Chromeの仕様対応）
@@ -62,7 +67,23 @@ function App() {
       window.speechSynthesis.speak(uttr);
     } else {
       // 韓国語音声がない場合はアラートで通知（変な声で再生されるのを防ぐ）
-      alert("ネイティブ音声の取得に失敗しました。\n\nお使いの端末に韓国語の音声データがありません。\nMacの場合：設定 ＞ アクセシビリティ ＞ 読み上げコンテンツ から「Yuna (韓国語)」を追加してください。");
+      alert("ネイティブ音声の取得に失敗しました。\n\nお使いの端末に韓国語의音声データ가ありません。\nMac의경우：設定 ＞ アクセシビリティ ＞ 読み上げコンテンツ 에서「Yuna (韓国語)」를追加해주세요.");
+    }
+  };
+
+  const scrollToCategory = (categoryName) => {
+    const id = categoryName.replace(/\s+/g, '-');
+    const element = document.getElementById(id);
+    if (element) {
+      // offset for sticky header
+      const headerOffset = 140;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
     }
   };
 
@@ -80,19 +101,55 @@ function App() {
             <span className="gradient-text">HelloTalk</span>
             <span className="subtitle">Korean Phrases</span>
           </h1>
-          <p>ネイティブとの会話で使える100のフレーズ練習帳</p>
+          <p>ネイティブとの会話で使えるフレーズ練習帳</p>
+
+          <div className="mode-tabs">
+            <button
+              className={`mode-tab ${mode === 'list' ? 'active' : ''}`}
+              onClick={() => setMode('list')}
+            >
+              📖 一覧モード
+            </button>
+            <button
+              className={`mode-tab ${mode === 'quiz' ? 'active' : ''}`}
+              onClick={() => setMode('quiz')}
+            >
+              🎧 クイズモード
+            </button>
+          </div>
         </div>
+
+        {/* Navigation Menu only visible in list mode */}
+        {mode === 'list' && (
+          <nav className="category-nav">
+            {categoryNames.map(cat => (
+              <button
+                key={cat}
+                className="nav-btn"
+                onClick={() => scrollToCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </nav>
+        )}
       </header>
 
       <main className="main-content">
-        {Object.entries(categories).map(([categoryName, phrases]) => (
-          <CategorySection
-            key={categoryName}
-            title={categoryName}
-            phrases={phrases}
-            onPlay={handlePlayAudio}
-          />
-        ))}
+        {mode === 'list' ? (
+          <>
+            {Object.entries(categories).map(([categoryName, phrases]) => (
+              <CategorySection
+                key={categoryName}
+                title={categoryName}
+                phrases={phrases}
+                onPlay={handlePlayAudio}
+              />
+            ))}
+          </>
+        ) : (
+          <QuizComponent />
+        )}
       </main>
 
       <footer className="glass-footer">
