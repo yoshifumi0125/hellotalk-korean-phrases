@@ -7,6 +7,8 @@ import './index.css';
 function App() {
   const [mode, setMode] = useState('list'); // 'list' | 'quiz'
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const categories = useMemo(() => {
     const cats = {};
     phrasesData.phrases.forEach(p => {
@@ -67,11 +69,12 @@ function App() {
       window.speechSynthesis.speak(uttr);
     } else {
       // 韓国語音声がない場合はアラートで通知（変な声で再生されるのを防ぐ）
-      alert("ネイティブ音声の取得に失敗しました。\n\nお使いの端末に韓国語의音声データ가ありません。\nMac의경우：設定 ＞ アクセシビリティ ＞ 読み上げコンテンツ 에서「Yuna (韓国語)」를追加해주세요.");
+      alert("ネイティブ音声の取得に失敗しました。\n\nお使いの端末に韓国語の音声データがありません。\nMacの場合：設定 ＞ アクセシビリティ ＞ 読み上げコンテンツ から「Yuna (韓国語)」を追加してください。");
     }
   };
 
   const scrollToCategory = (categoryName) => {
+    setIsMenuOpen(false); // Close menu after clicking
     const id = categoryName.replace(/\s+/g, '-');
     const element = document.getElementById(id);
     if (element) {
@@ -119,19 +122,35 @@ function App() {
           </div>
         </div>
 
-        {/* Navigation Menu only visible in list mode */}
+        {/* Hamburger Menu only visible in list mode */}
         {mode === 'list' && (
-          <nav className="category-nav">
-            {categoryNames.map(cat => (
-              <button
-                key={cat}
-                className="nav-btn"
-                onClick={() => scrollToCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </nav>
+          <div className="hamburger-menu-container">
+            <button
+              className="hamburger-btn"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <div className={`hamburger-icon ${isMenuOpen ? 'open' : ''}`}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              カテゴリを選択
+            </button>
+
+            {isMenuOpen && (
+              <nav className="dropdown-nav">
+                {categoryNames.map(cat => (
+                  <button
+                    key={cat}
+                    className="dropdown-btn"
+                    onClick={() => scrollToCategory(cat)}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </nav>
+            )}
+          </div>
         )}
       </header>
 
