@@ -2,12 +2,14 @@ import React, { useState, useMemo, useEffect } from 'react';
 import CategorySection from './components/CategorySection';
 import QuizComponent from './components/QuizComponent';
 import SpeakingComponent from './components/SpeakingComponent';
+import LevelComponent from './components/LevelComponent';
+import WordQuizComponent from './components/WordQuizComponent';
 import phrasesData from './data/phrases.json';
 import './index.css';
 import './App.css';
 
 function App() {
-  const [mode, setMode] = useState('list'); // 'list' | 'quiz' | 'speaking'
+  const [mode, setMode] = useState('list'); // 'list' | 'quiz' | 'speaking' | 'level' | 'wordquiz'
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -116,16 +118,28 @@ function App() {
               📖 一覧
             </button>
             <button
+              className={`mode-tab ${mode === 'level' ? 'active' : ''}`}
+              onClick={() => setMode('level')}
+            >
+              🏆 レベル
+            </button>
+            <button
               className={`mode-tab ${mode === 'quiz' ? 'active' : ''}`}
               onClick={() => setMode('quiz')}
             >
               🎧 クイズ
             </button>
             <button
+              className={`mode-tab ${mode === 'wordquiz' ? 'active' : ''}`}
+              onClick={() => setMode('wordquiz')}
+            >
+              📝 単語
+            </button>
+            <button
               className={`mode-tab ${mode === 'speaking' ? 'active' : ''}`}
               onClick={() => setMode('speaking')}
             >
-              🗣️ スピーキング
+              🗣️ 発音
             </button>
           </div>
         </div>
@@ -175,7 +189,9 @@ function App() {
             ))}
           </>
         )}
+        {mode === 'level' && <LevelComponent />}
         {mode === 'quiz' && <QuizComponent />}
+        {mode === 'wordquiz' && <WordQuizComponent />}
         {mode === 'speaking' && <SpeakingComponent />}
       </main>
 
