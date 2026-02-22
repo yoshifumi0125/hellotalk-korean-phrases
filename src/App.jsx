@@ -3,6 +3,7 @@ import CategorySection from './components/CategorySection';
 import QuizComponent from './components/QuizComponent';
 import phrasesData from './data/phrases.json';
 import './index.css';
+import './App.css';
 
 function App() {
   const [mode, setMode] = useState('list'); // 'list' | 'quiz'
