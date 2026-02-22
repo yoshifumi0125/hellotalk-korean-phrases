@@ -412,3 +412,137 @@
 .category-nav {
   display: none;
 }
+/* Speaking Component Styles */
+.speaking-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-badge {
+  background: var(--primary);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.phrase-display {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.speaking-korean {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #60a5fa;
+  margin-bottom: 0.5rem;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.speaking-kana {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+.speaking-ja {
+  font-size: 1.3rem;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+}
+
+.small-margin {
+  margin: 0 auto;
+}
+
+.recording-area {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.mic-btn {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+  border: none;
+  padding: 1.2rem 2.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mic-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+}
+
+.mic-btn.recording {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  animation: pulse 1.5s infinite alternate;
+  cursor: wait;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+  100% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+}
+
+.feedback-area {
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+  margin-bottom: 2rem;
+  border: 2px solid transparent;
+}
+
+.feedback-area.correct {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.feedback-area.wrong {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.user-spoken-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.user-spoken-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.correct-text {
+  color: #34d399;
+  font-size: 1.5rem;
+}
+
+.wrong-text {
+  color: #fca5a5;
+  font-size: 1.2rem;
+}
+
+.speaking-next {
+  align-self: center;
+  padding: 1rem 3rem;
+  font-size: 1.1rem;
+}

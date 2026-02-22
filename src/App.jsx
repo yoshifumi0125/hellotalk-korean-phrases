@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import CategorySection from './components/CategorySection';
 import QuizComponent from './components/QuizComponent';
+import SpeakingComponent from './components/SpeakingComponent';
 import phrasesData from './data/phrases.json';
 import './index.css';
 import './App.css';
 
 function App() {
-  const [mode, setMode] = useState('list'); // 'list' | 'quiz'
+  const [mode, setMode] = useState('list'); // 'list' | 'quiz' | 'speaking'
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -112,13 +113,19 @@ function App() {
               className={`mode-tab ${mode === 'list' ? 'active' : ''}`}
               onClick={() => setMode('list')}
             >
-              📖 一覧モード
+              📖 一覧
             </button>
             <button
               className={`mode-tab ${mode === 'quiz' ? 'active' : ''}`}
               onClick={() => setMode('quiz')}
             >
-              🎧 クイズモード
+              🎧 クイズ
+            </button>
+            <button
+              className={`mode-tab ${mode === 'speaking' ? 'active' : ''}`}
+              onClick={() => setMode('speaking')}
+            >
+              🗣️ スピーキング
             </button>
           </div>
         </div>
@@ -156,7 +163,7 @@ function App() {
       </header>
 
       <main className="main-content">
-        {mode === 'list' ? (
+        {mode === 'list' && (
           <>
             {Object.entries(categories).map(([categoryName, phrases]) => (
               <CategorySection
@@ -167,9 +174,9 @@ function App() {
               />
             ))}
           </>
-        ) : (
-          <QuizComponent />
         )}
+        {mode === 'quiz' && <QuizComponent />}
+        {mode === 'speaking' && <SpeakingComponent />}
       </main>
 
       <footer className="glass-footer">
