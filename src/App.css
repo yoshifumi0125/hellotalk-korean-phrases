@@ -34,12 +34,28 @@
 /* Category Navigation */
 .category-nav {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
   gap: 0.5rem;
   max-width: 800px;
   margin: 0 auto;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+/* center items if there is enough space on desktop */
+@media (min-width: 768px) {
+  .category-nav {
+    justify-content: center;
+  }
 }
 
 .nav-btn {
@@ -52,6 +68,8 @@
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  flex-shrink: 0;
+  /* Prevent buttons from shrinking */
 }
 
 .nav-btn:hover {
@@ -75,14 +93,16 @@
   flex-direction: column;
 }
 
-.start-screen, .result-screen {
+.start-screen,
+.result-screen {
   align-items: center;
   justify-content: center;
   text-align: center;
   gap: 1.5rem;
 }
 
-.start-screen h2, .result-screen h2 {
+.start-screen h2,
+.result-screen h2 {
   font-size: 2rem;
   color: var(--text-main);
   margin-bottom: 1rem;
@@ -247,22 +267,29 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 640px) {
   .quiz-container {
     padding: 1.5rem;
   }
-  
+
   .answer-feedback {
     flex-direction: column;
     gap: 1.5rem;
     text-align: center;
     align-items: flex-start;
   }
-  
+
   .next-btn {
     width: 100%;
     margin-top: 1rem;
