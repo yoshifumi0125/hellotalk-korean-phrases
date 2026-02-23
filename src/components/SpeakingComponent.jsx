@@ -26,6 +26,30 @@ const SpeakingComponent = () => {
         return str.replace(/[!?.,\s]/g, '').trim();
     };
 
+    // 類似度スコアを計算する関数（レーベンシュタイン距離ベース）
+    const getSimilarity = (a, b) => {
+        if (a === b) return 1;
+        if (!a.length || !b.length) return 0;
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b[i - 1] === a[j - 1]) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+                }
+            }
+        }
+        const maxLen = Math.max(a.length, b.length);
+        return 1 - matrix[b.length][a.length] / maxLen;
+    };
+
     // 連続で音声認識を開始する関数
     const startListening = useCallback(() => {
         if (!SpeechRecognition || !questions.length) return;
@@ -50,10 +74,18 @@ const SpeakingComponent = () => {
             const target = normalizeString(currentItem.ko);
             const spoken = normalizeString(transcript);
 
-            if (spoken === target || spoken.includes(target) || target.includes(spoken)) {
+            // 類似度スコアで判定（単語: 80%以上、フレーズ: 70%以上）
+            const similarity = getSimilarity(spoken, target);
+            const isWord = speakingMode === 'word';
+            const threshold = isWord ? 0.8 : 0.7;
+
+            // 長さチェック：話した内容がお題の50%未満の長さなら不正解
+            const lengthRatio = spoken.length / target.length;
+
+            if (similarity >= threshold && lengthRatio >= 0.5) {
                 setFeedback('correct');
                 setScore(prev => prev + 1);
-                // 正解なら1.5秒後に自動で次へ
+                // 正解なら2秒後に自動で次へ（日本語訳を読む時間を確保）
                 setTimeout(() => {
                     if (currentIndex < questions.length - 1) {
                         setCurrentIndex(prev => prev + 1);
@@ -62,14 +94,13 @@ const SpeakingComponent = () => {
                     } else {
                         setSpeakingMode('result');
                     }
-                }, 1200);
+                }, 2000);
             } else {
                 setFeedback('wrong');
-                // 不正解でも2秒後に自動で再度リスニング開始
                 setTimeout(() => {
                     setUserScript('');
                     setFeedback(null);
-                }, 1500);
+                }, 1800);
             }
         };
 
@@ -221,7 +252,10 @@ const SpeakingComponent = () => {
                     <p className="user-spoken-text">{userScript}</p>
                     <div className="feedback-result">
                         {feedback === 'correct' ? (
-                            <h3 className="correct-text">🎉 正解！</h3>
+                            <>
+                                <h3 className="correct-text">🎉 正解！</h3>
+                                <p className="feedback-ja">{currentItem.ja}</p>
+                            </>
                         ) : (
                             <h3 className="wrong-text">❌ もう一度！</h3>
                         )}
