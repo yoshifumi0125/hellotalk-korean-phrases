@@ -13,6 +13,7 @@ const SpeakingComponent = () => {
     const [score, setScore] = useState(0);
     const [autoListening, setAutoListening] = useState(false);
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+    const [interimText, setInterimText] = useState(''); // リアルタイム表示用
     const recognitionRef = useRef(null);
     const autoListenTimerRef = useRef(null);
 
@@ -23,7 +24,6 @@ const SpeakingComponent = () => {
             setRecognitionSupported(false);
         }
         return () => {
-            // クリーンアップ
             if (recognitionRef.current) {
                 try { recognitionRef.current.abort(); } catch (e) { }
             }
@@ -76,57 +76,81 @@ const SpeakingComponent = () => {
     const startListening = useCallback(() => {
         if (!SpeechRecognition || !questions.length || isPlayingAudio) return;
 
-        // 既存の認識があれば停止
         stopListening();
 
         const recognition = new SpeechRecognition();
         recognition.lang = 'ko-KR';
-        recognition.interimResults = false;
+        recognition.interimResults = true;  // リアルタイム表示を有効に
+        recognition.continuous = true;      // 長文対応：自動で止まらない
         recognition.maxAlternatives = 1;
         recognitionRef.current = recognition;
 
         recognition.onstart = () => {
             setIsRecording(true);
+            setInterimText('');
         };
 
         recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            setUserScript(transcript);
+            let finalTranscript = '';
+            let interim = '';
 
-            const currentItem = questions[currentIndex];
-            const target = normalizeString(currentItem.ko);
-            const spoken = normalizeString(transcript);
+            for (let i = 0; i < event.results.length; i++) {
+                const result = event.results[i];
+                if (result.isFinal) {
+                    finalTranscript += result[0].transcript;
+                } else {
+                    interim += result[0].transcript;
+                }
+            }
 
-            const similarity = getSimilarity(spoken, target);
-            const isWord = speakingMode === 'word';
-            const threshold = isWord ? 0.8 : 0.7;
-            const lengthRatio = spoken.length / target.length;
+            // リアルタイム表示（中間結果 + 確定結果）
+            const displayText = finalTranscript || interim;
+            setInterimText(displayText);
 
-            if (similarity >= threshold && lengthRatio >= 0.5) {
-                setFeedback('correct');
-                setScore(prev => prev + 1);
-                autoListenTimerRef.current = setTimeout(() => {
-                    if (currentIndex < questions.length - 1) {
-                        setCurrentIndex(prev => prev + 1);
+            // 確定結果がある場合のみ判定
+            if (finalTranscript) {
+                // 認識を停止
+                try { recognition.stop(); } catch (e) { }
+
+                setUserScript(finalTranscript);
+                setInterimText('');
+
+                const currentItem = questions[currentIndex];
+                const target = normalizeString(currentItem.ko);
+                const spoken = normalizeString(finalTranscript);
+
+                const similarity = getSimilarity(spoken, target);
+                const isWord = speakingMode === 'word';
+                const threshold = isWord ? 0.8 : 0.7;
+                const lengthRatio = spoken.length / target.length;
+
+                if (similarity >= threshold && lengthRatio >= 0.5) {
+                    setFeedback('correct');
+                    setScore(prev => prev + 1);
+                    autoListenTimerRef.current = setTimeout(() => {
+                        if (currentIndex < questions.length - 1) {
+                            setCurrentIndex(prev => prev + 1);
+                            setUserScript('');
+                            setFeedback(null);
+                        } else {
+                            setSpeakingMode('result');
+                            setAutoListening(false);
+                        }
+                    }, 2000);
+                } else {
+                    setFeedback('wrong');
+                    autoListenTimerRef.current = setTimeout(() => {
                         setUserScript('');
                         setFeedback(null);
-                    } else {
-                        setSpeakingMode('result');
-                        setAutoListening(false);
-                    }
-                }, 2000);
-            } else {
-                setFeedback('wrong');
-                autoListenTimerRef.current = setTimeout(() => {
-                    setUserScript('');
-                    setFeedback(null);
-                }, 1800);
+                    }, 1800);
+                }
             }
         };
 
         recognition.onerror = (event) => {
             console.error("Speech recognition error", event.error);
             setIsRecording(false);
+            setInterimText('');
             if (event.error === 'not-allowed') {
                 alert("マイクの使用が許可されていません。ブラウザの設定でマイクへのアクセスを許可してください。");
                 setAutoListening(false);
@@ -135,6 +159,7 @@ const SpeakingComponent = () => {
 
         recognition.onend = () => {
             setIsRecording(false);
+            setInterimText('');
         };
 
         try {
@@ -311,6 +336,13 @@ const SpeakingComponent = () => {
                     {isPlayingAudio ? "🔊 音声再生中..." : isRecording ? "🎙️ 聞き取り中..." : feedback ? "⏳ 次へ..." : "🎤 話してください"}
                 </div>
             </div>
+
+            {/* リアルタイム表示 */}
+            {isRecording && interimText && !feedback && (
+                <div className="interim-display">
+                    <p className="interim-text">{interimText}</p>
+                </div>
+            )}
 
             {userScript && (
                 <div className={`feedback-area ${feedback}`}>
