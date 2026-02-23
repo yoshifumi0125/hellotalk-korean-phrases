@@ -4,6 +4,7 @@ import QuizComponent from './components/QuizComponent';
 import SpeakingComponent from './components/SpeakingComponent';
 import LevelComponent from './components/LevelComponent';
 import WordQuizComponent from './components/WordQuizComponent';
+import ChatComponent from './components/ChatComponent';
 import phrasesData from './data/phrases.json';
 import './index.css';
 import './App.css';
@@ -81,12 +82,13 @@ function App() {
     }
   };
 
-  const isActiveMode = mode === 'quiz' || mode === 'wordquiz' || mode === 'speaking';
+  const isActiveMode = mode === 'quiz' || mode === 'wordquiz' || mode === 'speaking' || mode === 'chat';
 
   const modeLabels = {
     quiz: '🎧 リスニングクイズ',
     wordquiz: '📝 単語クイズ',
     speaking: '🗣️ スピーキング',
+    chat: '💬 会話練習',
   };
 
   return (
@@ -153,6 +155,7 @@ function App() {
         {mode === 'quiz' && <QuizComponent />}
         {mode === 'wordquiz' && <WordQuizComponent />}
         {mode === 'speaking' && <SpeakingComponent />}
+        {mode === 'chat' && <ChatComponent />}
       </main>
 
       {/* Bottom Tab Bar - only visible on home and list screens */}
@@ -173,6 +176,10 @@ function App() {
           <button className={`tab-item ${mode === 'speaking' ? 'active' : ''}`} onClick={() => setMode('speaking')}>
             <span className="tab-icon">🗣️</span>
             <span className="tab-label">発音</span>
+          </button>
+          <button className={`tab-item ${mode === 'chat' ? 'active' : ''}`} onClick={() => setMode('chat')}>
+            <span className="tab-icon">💬</span>
+            <span className="tab-label">会話</span>
           </button>
           <button className={`tab-item ${mode === 'list' ? 'active' : ''}`} onClick={() => setMode('list')}>
             <span className="tab-icon">📖</span>

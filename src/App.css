@@ -867,3 +867,211 @@
   color: #93c5fd;
   font-family: 'Noto Sans KR', sans-serif;
 }
+
+/* ========================================
+   Chat Component - LINE/KakaoTalk style
+   ======================================== */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.chat-character-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.chat-intro-text {
+  font-size: 1.2rem;
+  color: #60a5fa;
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.chat-intro-sub {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.scenario-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.scenario-btn {
+  background: rgba(30, 41, 59, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.scenario-btn:hover {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  transform: translateX(4px);
+}
+
+.scenario-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.scenario-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.result-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Chat Header */
+.chat-header-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 0.5rem;
+}
+
+.chat-partner-name {
+  font-weight: 700;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.chat-translate-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chat-translate-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+/* Chat Log */
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.chat-bubble-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.chat-bubble-wrap.user {
+  flex-direction: row-reverse;
+}
+
+.chat-bubble {
+  max-width: 75%;
+  padding: 0.8rem 1rem;
+  border-radius: 16px;
+  position: relative;
+}
+
+.chat-bubble.npc {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-bubble.user {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-bottom-right-radius: 4px;
+}
+
+.chat-bubble.user.incorrect {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  opacity: 0.8;
+}
+
+.chat-bubble.user.correct-bubble {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.bubble-ko {
+  font-size: 1rem;
+  font-family: 'Noto Sans KR', sans-serif;
+  line-height: 1.5;
+}
+
+.bubble-ja {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Chat Options */
+.chat-options {
+  padding: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.chat-option-btn {
+  background: rgba(59, 130, 246, 0.08);
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  color: var(--text-main);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.chat-option-btn:hover {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+  transform: translateX(4px);
+}
+
+.option-ko {
+  font-size: 0.95rem;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.option-ja {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
