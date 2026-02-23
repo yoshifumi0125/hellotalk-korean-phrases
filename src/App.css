@@ -766,3 +766,22 @@
     font-size: 1.8rem;
   }
 }
+/* Mic status (auto-listening) */
+.mic-status {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0.8rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s;
+}
+
+.mic-status.recording {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.08);
+  animation: pulse 1.5s infinite alternate;
+}
