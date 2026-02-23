@@ -81,6 +81,14 @@ function App() {
     }
   };
 
+  const isActiveMode = mode === 'quiz' || mode === 'wordquiz' || mode === 'speaking';
+
+  const modeLabels = {
+    quiz: '🎧 リスニングクイズ',
+    wordquiz: '📝 単語クイズ',
+    speaking: '🗣️ スピーキング',
+  };
+
   return (
     <div className="app-container">
       <div className="background-shapes">
@@ -89,9 +97,23 @@ function App() {
         <div className="shape shape-3"></div>
       </div>
 
-      {/* Compact top bar - only in list mode */}
+      {/* Back header - active modes only */}
+      {isActiveMode && (
+        <header className="compact-header">
+          <button className="back-button" onClick={() => setMode('level')}>
+            ← 戻る
+          </button>
+          <span className="mode-header-label">{modeLabels[mode]}</span>
+          <div style={{ width: '60px' }}></div>
+        </header>
+      )}
+
+      {/* Compact top bar - list mode only */}
       {mode === 'list' && (
         <header className="compact-header">
+          <button className="back-button" onClick={() => setMode('level')}>
+            ← 戻る
+          </button>
           <h1 className="compact-title">
             <span className="gradient-text">HelloTalk</span> Korean
           </h1>
@@ -114,7 +136,7 @@ function App() {
         </header>
       )}
 
-      <main className="main-content-full">
+      <main className={`main-content-full ${isActiveMode ? 'no-bottom-padding' : ''}`}>
         {mode === 'list' && (
           <>
             {Object.entries(categories).map(([categoryName, phrases]) => (
@@ -133,29 +155,31 @@ function App() {
         {mode === 'speaking' && <SpeakingComponent />}
       </main>
 
-      {/* Bottom Tab Bar - Duolingo style */}
-      <nav className="bottom-tab-bar">
-        <button className={`tab-item ${mode === 'level' ? 'active' : ''}`} onClick={() => setMode('level')}>
-          <span className="tab-icon">🏠</span>
-          <span className="tab-label">ホーム</span>
-        </button>
-        <button className={`tab-item ${mode === 'quiz' ? 'active' : ''}`} onClick={() => setMode('quiz')}>
-          <span className="tab-icon">🎧</span>
-          <span className="tab-label">クイズ</span>
-        </button>
-        <button className={`tab-item ${mode === 'wordquiz' ? 'active' : ''}`} onClick={() => setMode('wordquiz')}>
-          <span className="tab-icon">📝</span>
-          <span className="tab-label">単語</span>
-        </button>
-        <button className={`tab-item ${mode === 'speaking' ? 'active' : ''}`} onClick={() => setMode('speaking')}>
-          <span className="tab-icon">🗣️</span>
-          <span className="tab-label">発音</span>
-        </button>
-        <button className={`tab-item ${mode === 'list' ? 'active' : ''}`} onClick={() => setMode('list')}>
-          <span className="tab-icon">📖</span>
-          <span className="tab-label">一覧</span>
-        </button>
-      </nav>
+      {/* Bottom Tab Bar - only visible on home and list screens */}
+      {!isActiveMode && (
+        <nav className="bottom-tab-bar">
+          <button className={`tab-item ${mode === 'level' ? 'active' : ''}`} onClick={() => setMode('level')}>
+            <span className="tab-icon">🏠</span>
+            <span className="tab-label">ホーム</span>
+          </button>
+          <button className={`tab-item ${mode === 'quiz' ? 'active' : ''}`} onClick={() => setMode('quiz')}>
+            <span className="tab-icon">🎧</span>
+            <span className="tab-label">クイズ</span>
+          </button>
+          <button className={`tab-item ${mode === 'wordquiz' ? 'active' : ''}`} onClick={() => setMode('wordquiz')}>
+            <span className="tab-icon">📝</span>
+            <span className="tab-label">単語</span>
+          </button>
+          <button className={`tab-item ${mode === 'speaking' ? 'active' : ''}`} onClick={() => setMode('speaking')}>
+            <span className="tab-icon">🗣️</span>
+            <span className="tab-label">発音</span>
+          </button>
+          <button className={`tab-item ${mode === 'list' ? 'active' : ''}`} onClick={() => setMode('list')}>
+            <span className="tab-icon">📖</span>
+            <span className="tab-label">一覧</span>
+          </button>
+        </nav>
+      )}
     </div>
   );
 }
