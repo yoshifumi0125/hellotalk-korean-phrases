@@ -1,44 +1,55 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import phrasesData from '../data/phrases.json';
+import levelsData from '../data/levels.json';
 
 const SpeakingComponent = () => {
+    const [speakingMode, setSpeakingMode] = useState(null); // 'phrase' | 'word'
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isRecording, setIsRecording] = useState(false);
     const [userScript, setUserScript] = useState('');
-    const [feedback, setFeedback] = useState(null); // 'correct' | 'wrong' | null
+    const [feedback, setFeedback] = useState(null);
     const [recognitionSupported, setRecognitionSupported] = useState(true);
+    const [score, setScore] = useState(0);
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     useEffect(() => {
         if (!SpeechRecognition) {
             setRecognitionSupported(false);
-            return;
         }
+    }, [SpeechRecognition]);
 
-        // シャッフルして10問セットを作る
+    const startPhraseMode = () => {
         const shuffled = [...phrasesData.phrases].sort(() => 0.5 - Math.random());
         setQuestions(shuffled.slice(0, 10));
-    }, [SpeechRecognition]);
+        setSpeakingMode('phrase');
+        setCurrentIndex(0);
+        setScore(0);
+        setUserScript('');
+        setFeedback(null);
+    };
+
+    const startWordMode = () => {
+        const shuffled = [...levelsData.wordQuiz].sort(() => 0.5 - Math.random());
+        setQuestions(shuffled.slice(0, 10));
+        setSpeakingMode('word');
+        setCurrentIndex(0);
+        setScore(0);
+        setUserScript('');
+        setFeedback(null);
+    };
 
     if (!recognitionSupported) {
         return (
             <div className="quiz-container start-screen">
                 <h2>🗣️ スピーキングモード</h2>
-                <p>大変申し訳ありません。お使いのブラウザは音声認識機能（マイク入力）をサポートしていません。</p>
+                <p>お使いのブラウザは音声認識機能をサポートしていません。</p>
                 <p>Google Chrome または 最新のSafariをご利用ください。</p>
             </div>
         );
     }
 
-    if (questions.length === 0) {
-        return <div className="quiz-container">読み込み中...</div>;
-    }
-
-    const currentPhrase = questions[currentIndex];
-
-    // 発音記号や空白を除外して比較しやすくする関数
     const normalizeString = (str) => {
         return str.replace(/[!?.,\s]/g, '').trim();
     };
@@ -67,12 +78,13 @@ const SpeakingComponent = () => {
             const transcript = event.results[0][0].transcript;
             setUserScript(transcript);
 
-            // 正誤判定
-            const target = normalizeString(currentPhrase.ko);
+            const currentItem = questions[currentIndex];
+            const target = normalizeString(currentItem.ko);
             const spoken = normalizeString(transcript);
 
             if (spoken === target || spoken.includes(target) || target.includes(spoken)) {
                 setFeedback('correct');
+                setScore(prev => prev + 1);
             } else {
                 setFeedback('wrong');
             }
@@ -99,32 +111,84 @@ const SpeakingComponent = () => {
             setUserScript('');
             setFeedback(null);
         } else {
-            // クイズ終了したら再度シャッフルしてリスタート
-            const shuffled = [...phrasesData.phrases].sort(() => 0.5 - Math.random());
-            setQuestions(shuffled.slice(0, 10));
-            setCurrentIndex(0);
-            setUserScript('');
-            setFeedback(null);
+            // 結果画面を表示するため speakingMode を 'result' に
+            setSpeakingMode('result');
         }
     };
+
+    // ======== モード選択画面 ========
+    if (speakingMode === null) {
+        return (
+            <div className="quiz-container start-screen">
+                <h2>🗣️ スピーキング練習</h2>
+                <p>マイクに向かって韓国語を発音してみましょう！</p>
+                <div className="word-quiz-modes">
+                    <button className="start-btn" onClick={startPhraseMode}>
+                        💬 フレーズの発音練習
+                    </button>
+                    <button className="start-btn reverse-btn" onClick={startWordMode}>
+                        📝 単語の読み練習
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // ======== 結果画面 ========
+    if (speakingMode === 'result') {
+        const percentage = Math.round((score / 10) * 100);
+        return (
+            <div className="quiz-container result-screen">
+                <h2>スピーキング結果</h2>
+                <div className="score-display">
+                    <span className="score-number">{score}</span> / 10
+                </div>
+                <p className="result-message">
+                    {score === 10 ? "パーフェクト！🎉" : score >= 8 ? "素晴らしい発音です！✨" : score >= 5 ? "いい調子です！👍" : "もっと練習しましょう！💪"}
+                </p>
+                <div className="word-quiz-modes">
+                    <button className="start-btn" onClick={startPhraseMode}>💬 フレーズをもう一度</button>
+                    <button className="start-btn reverse-btn" onClick={startWordMode}>📝 単語をもう一度</button>
+                    <button className="start-btn back-btn" onClick={() => setSpeakingMode(null)}>モード選択に戻る</button>
+                </div>
+            </div>
+        );
+    }
+
+    // ======== プレイ画面 ========
+    if (questions.length === 0) {
+        return <div className="quiz-container">読み込み中...</div>;
+    }
+
+    const currentItem = questions[currentIndex];
+    const isWordMode = speakingMode === 'word';
 
     return (
         <div className="quiz-container speaking-container">
             <div className="quiz-header">
-                <span className="question-count">フレーズ {currentIndex + 1} / 10</span>
-                <span className="mode-badge">🗣️ 発音練習</span>
+                <span className="question-count">
+                    {isWordMode ? '📝' : '💬'} {currentIndex + 1} / 10
+                </span>
+                <span className="current-score">正解: {score}</span>
+            </div>
+
+            {/* プログレスバー */}
+            <div className="progress-bar-container">
+                <div className="progress-bar-fill" style={{ width: `${(currentIndex / 10) * 100}%` }}></div>
             </div>
 
             <div className="phrase-display">
-                <h2 className="speaking-korean">{currentPhrase.ko}</h2>
-                <p className="speaking-kana">{currentPhrase.kana}</p>
-                <p className="speaking-ja">{currentPhrase.ja}</p>
-                <button
-                    className="replay-btn small-margin"
-                    onClick={() => playAudio(currentPhrase.audioPath)}
-                >
-                    🔊 お手本を聞く
-                </button>
+                <h2 className="speaking-korean">{currentItem.ko}</h2>
+                <p className="speaking-kana">{currentItem.kana}</p>
+                <p className="speaking-ja">{currentItem.ja}</p>
+                {!isWordMode && currentItem.audioPath && (
+                    <button
+                        className="replay-btn small-margin"
+                        onClick={() => playAudio(currentItem.audioPath)}
+                    >
+                        🔊 お手本を聞く
+                    </button>
+                )}
             </div>
 
             <div className="recording-area">
@@ -133,29 +197,35 @@ const SpeakingComponent = () => {
                     onClick={startRecording}
                     disabled={isRecording}
                 >
-                    {isRecording ? "🎙️ 音声を聞き取っています..." : "🎤 マイクを押して発音する"}
+                    {isRecording ? "🎙️ 聞き取り中..." : "🎤 タップして発音する"}
                 </button>
             </div>
 
             {userScript && (
                 <div className={`feedback-area ${feedback}`}>
-                    <p className="user-spoken-label">あなたが発音した内容：</p>
+                    <p className="user-spoken-label">あなたの発音：</p>
                     <p className="user-spoken-text">{userScript}</p>
-
                     <div className="feedback-result">
                         {feedback === 'correct' ? (
-                            <h3 className="correct-text">🎉 素晴らしい！通じます！</h3>
+                            <h3 className="correct-text">🎉 通じます！</h3>
                         ) : (
-                            <h3 className="wrong-text">惜しい！もう一度試してみましょう。</h3>
+                            <h3 className="wrong-text">惜しい！もう一度！</h3>
                         )}
                     </div>
                 </div>
             )}
 
             {feedback && (
-                <button className="next-btn speaking-next" onClick={handleNext}>
-                    {currentIndex < questions.length - 1 ? "次のフレーズへ ➔" : "最初からやり直す ➔"}
-                </button>
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                    {feedback === 'wrong' && (
+                        <button className="next-btn back-btn" style={{ flex: 1 }} onClick={startRecording}>
+                            🔄 もう一度
+                        </button>
+                    )}
+                    <button className="next-btn speaking-next" style={{ flex: 1 }} onClick={handleNext}>
+                        {currentIndex < questions.length - 1 ? "次へ ➔" : "結果を見る ➔"}
+                    </button>
+                </div>
             )}
         </div>
     );
