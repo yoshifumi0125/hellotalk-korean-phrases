@@ -4,7 +4,7 @@ import QuizComponent from './components/QuizComponent';
 import SpeakingComponent from './components/SpeakingComponent';
 import LevelComponent from './components/LevelComponent';
 import WordQuizComponent from './components/WordQuizComponent';
-import ChatComponent from './components/ChatComponent';
+import SpeakingChatComponent from './components/SpeakingChatComponent';
 import phrasesData from './data/phrases.json';
 import './index.css';
 import './App.css';
@@ -155,7 +155,7 @@ function App() {
         {mode === 'quiz' && <QuizComponent />}
         {mode === 'wordquiz' && <WordQuizComponent />}
         {mode === 'speaking' && <SpeakingComponent />}
-        {mode === 'chat' && <ChatComponent />}
+        {mode === 'chat' && <SpeakingChatComponent />}
       </main>
 
       {/* Bottom Tab Bar - only visible on home and list screens */}

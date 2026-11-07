@@ -47,5 +47,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>韓国語のスピーキング練習で音声入力に使用します</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>韓国語の発音を認識して正確さを判定するために使用します</string>
 </dict>
 </plist>

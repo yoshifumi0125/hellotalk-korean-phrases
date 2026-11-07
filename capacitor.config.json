@@ -1,5 +1,10 @@
 {
   "appId": "com.hellotalk.korean",
   "appName": "HelloTalk Korean",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "allowNavigation": [
+      "generativelanguage.googleapis.com"
+    ]
+  }
 }
